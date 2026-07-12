@@ -1,0 +1,17 @@
+# secrets — repo is public, never commit real keys
+.env
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# local scratch
+scratchpad/
+
+# large dataset — re-downloadable from the assignment link, kept out of the public repo
+medium-english-50mb.csv
+
+# IDE / tooling
+.idea/
+.claude/

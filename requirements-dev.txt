@@ -1,0 +1,7 @@
+# Local ingestion & evaluation only. NOT the deployed Vercel function.
+pandas
+tiktoken
+openai
+pinecone
+python-dotenv
+numpy

@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "description": "Gold evaluation set for the Medium Article RAG assistant. article_id == 0-based row index in medium-english-50mb.csv (7682 rows, no rows dropped). Used by the Phase 2 retrieval sweep to compute hit-rate and MRR; no LLM calls required.",
+    "csv_rows": 7682,
+    "id_scheme": "0-based CSV row index, stable across all runs",
+    "scoring": {
+      "single": "hit if any id in acceptable_article_ids appears among the deduplicated retrieved article_ids within top-k; reciprocal rank = 1 / rank of first such id.",
+      "multi": "hit if at least min_distinct DISTINCT ids from acceptable_article_ids appear among the deduplicated retrieved article_ids within top-k.",
+      "recommendation": "hit if any id in acceptable_article_ids appears; primary_article_id is the strongest single match."
+    },
+    "type_counts": {"fact": 3, "multi": 2, "summary": 3, "recommendation": 2}
+  },
+  "questions": [
+    {
+      "id": "g01",
+      "type": "fact",
+      "source": "pdf_example",
+      "question": "Find an article that reframes marketing as a conversation with readers, aimed at writers who find self-promotion uncomfortable. Provide the title and author.",
+      "primary_article_id": 37,
+      "acceptable_article_ids": [37],
+      "min_distinct": 1,
+      "target_title": "A Marketing Guide for Introverts",
+      "target_authors": ["Shaunta Grimes"],
+      "evidence": "Text: \"Marketing is just a conversation between you and your readers. If you can remember that, then you can manage your fear about it.\" Aimed at introverts (uncomfortable with self-promotion)."
+    },
+    {
+      "id": "g02",
+      "type": "multi",
+      "source": "pdf_example",
+      "question": "List exactly 3 articles about education. Return only the titles.",
+      "primary_article_id": null,
+      "acceptable_article_ids": [669, 1247, 1303, 3067, 5135, 5338, 5764, 5997, 6599, 6649],
+      "min_distinct": 3,
+      "target_title": null,
+      "evidence": "All 10 acceptable ids have 'education' in the title and are on-topic (education reform, public education, educational AI/chatbots, environmental education, etc.). Must return 3 DISTINCT articles, not 3 chunks of one."
+    },
+    {
+      "id": "g03",
+      "type": "summary",
+      "source": "pdf_example",
+      "question": "Find an article that argues past pandemics (such as the bubonic plague) can spur innovation and recovery, and summarise its central argument.",
+      "primary_article_id": 6299,
+      "acceptable_article_ids": [6299],
+      "min_distinct": 1,
+      "target_title": "Rebounding From The Pandemic… with AI",
+      "target_authors": ["Massimiliano Versace"],
+      "evidence": "Text: \"In the mid-1300s, my native Italy was devastated by the bubonic plague... it is also believed to have seeded the Renaissance... one of the most prolific periods of our modern society.\""
+    },
+    {
+      "id": "g04",
+      "type": "recommendation",
+      "source": "pdf_example",
+      "question": "I want practical, beginner-friendly advice on building habits that actually stick. Which article would you recommend, and why?",
+      "primary_article_id": 5977,
+      "acceptable_article_ids": [5977, 899, 4990, 5262, 1739, 299, 3426],
+      "min_distinct": 1,
+      "target_title": "Building and Breaking Habits — An Essential Guide",
+      "target_authors": ["Jazz Parks"],
+      "evidence": "5977 is an 'Essential Guide' to building/breaking habits with practical steps ('start small'). Acceptable alternates are other practical habit-formation guides (Atomic Habits summaries, 'Magic Key to Making Habits Sticky', 'How To Change A Habit')."
+    },
+    {
+      "id": "g05",
+      "type": "fact",
+      "source": "authored",
+      "question": "Find an article explaining how training your sense of smell can strengthen your brain's neural pathways in about six weeks. Give the title and author.",
+      "primary_article_id": 2,
+      "acceptable_article_ids": [2],
+      "min_distinct": 1,
+      "target_title": "Mind Your Nose",
+      "target_authors": ["Ann-Sophie Barwich"],
+      "evidence": "Subtitle: \"How smell training can change your brain in six weeks\"; body discusses the olfactory system's plasticity and strengthening neural pathways. (authors field is empty in CSV; author name appears in body text.)"
+    },
+    {
+      "id": "g06",
+      "type": "fact",
+      "source": "authored",
+      "question": "Which article breaks down the behavioral-science and psychology principles that Coursera uses to make its online education experience addictive?",
+      "primary_article_id": 669,
+      "acceptable_article_ids": [669],
+      "min_distinct": 1,
+      "target_title": "How Coursera uses psychology to make education addictive",
+      "target_authors": ["Jennifer Clinehens"],
+      "evidence": "Title and body: \"How Coursera uses psychology to make education addictive — The behavioral science principles behind their experience.\""
+    },
+    {
+      "id": "g07",
+      "type": "summary",
+      "source": "authored",
+      "question": "Summarise the central argument of an article about the decline of trust in experts and where the concept of the 'expert' originated.",
+      "primary_article_id": 1983,
+      "acceptable_article_ids": [1983],
+      "min_distinct": 1,
+      "target_title": "Truth and Trust: the Rise and Fall of the Expert",
+      "target_authors": ["Adam De Salle"],
+      "evidence": "Discusses distrust in experts underpinning conspiracy theories and cites William Davies' 'Decline of Reason' on the 17th-century origin of the expert."
+    },
+    {
+      "id": "g08",
+      "type": "summary",
+      "source": "authored",
+      "question": "Summarise the main idea of an article about how the coronavirus pandemic and isolation affect the human brain and mental health.",
+      "primary_article_id": 1,
+      "acceptable_article_ids": [1],
+      "min_distinct": 1,
+      "target_title": "Your Brain On Coronavirus",
+      "target_authors": ["Simon Spichak"],
+      "evidence": "Subtitle: \"A guide to the curious and troubling impact of the pandemic and isolation\"; body links the disease to stroke and worsening mental health."
+    },
+    {
+      "id": "g09",
+      "type": "multi",
+      "source": "authored",
+      "question": "List exactly 3 articles about building or forming good habits. Return only the titles.",
+      "primary_article_id": null,
+      "acceptable_article_ids": [299, 334, 529, 899, 921, 1739, 3426, 4990, 5262, 5977],
+      "min_distinct": 3,
+      "target_title": null,
+      "evidence": "All acceptable ids are habit-formation articles (The Power of Habit, Atomic Habits summaries, 'How To Change A Habit', 'The Magic Key to Making Habits Sticky', 'How I Built a Lasting Exercise Habit', etc.). Must return 3 DISTINCT articles."
+    },
+    {
+      "id": "g10",
+      "type": "recommendation",
+      "source": "authored",
+      "question": "I'm a creator trying to grow my audience and newsletter subscribers. Which article would you recommend, and why?",
+      "primary_article_id": 1968,
+      "acceptable_article_ids": [1968, 2019],
+      "min_distinct": 1,
+      "target_title": "The Ultimate Guide To Growing Your Audience",
+      "target_authors": ["Josh Spector"],
+      "evidence": "1968 lays out 'the six elements of an effective audience growth strategy' and newsletter growth. 2019 ('12 Very Creative Ways to Promote Your Writing') is an acceptable alternate."
+    }
+  ]
+}
