@@ -1,0 +1,6 @@
+# Deployed Vercel function ONLY. It embeds one question and queries Pinecone.
+# Do NOT add pandas or tiktoken here -- those belong to the local ingestion
+# scripts (see requirements-dev.txt).
+fastapi==0.115.6
+openai==1.59.6
+pinecone==5.4.2
