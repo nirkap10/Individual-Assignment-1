@@ -26,6 +26,7 @@ load_dotenv(config.REPO_ROOT / ".env")
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 CTX_KEYS = {"article_id", "title", "chunk", "score"}
+REFUSAL = "I don't know based on the provided Medium articles data"
 
 
 def check_stats(client) -> list[str]:
@@ -72,9 +73,18 @@ def check_prompt(client, q: dict) -> list[str]:
     hit = gold & set(ids)
     rank = next((i for i, a in enumerate(ids, 1) if a in gold), None)
 
+    # Retrieval succeeding while the model still refuses is the failure mode
+    # that shape checks miss: the answer looks wrong to a human but every
+    # structural assertion passes.
+    answer = d.get("response", "")
+    if hit and REFUSAL.lower() in answer.lower():
+        errs.append(
+            f"[{q['id']}] refused despite retrieving the gold article at rank {rank}"
+        )
+
     print(f"\n[{q['id']}] {q['type']}: {q['question'][:70]}")
     print(f"  context: {len(ctx)} distinct articles | gold hit: {'yes rank ' + str(rank) if hit else 'NO'}")
-    print(f"  answer : {d['response'][:200].replace(chr(10), ' ')}")
+    print(f"  answer : {answer[:200].replace(chr(10), ' ')}")
     return errs
 
 
