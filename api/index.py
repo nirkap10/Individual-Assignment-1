@@ -97,8 +97,22 @@ def dedup_to_articles(matches) -> list[dict]:
                 "title": str(meta.get("title", "")),
                 "chunk": str(meta.get("chunk_text", "")),
                 "score": float(m.get("score", 0.0)),
+                # Underscored keys are for the prompt only. The API contract
+                # fixes the four fields above, so these are stripped before the
+                # context array is returned.
+                "_authors": meta.get("authors") or [],
+                "_url": str(meta.get("url", "")),
+                "_timestamp": str(meta.get("timestamp", "")),
             }
     return list(best.values())
+
+
+def public_context(items: list[dict]) -> list[dict]:
+    """Drop the prompt-only keys so the response matches the spec exactly."""
+    return [
+        {k: c[k] for k in ("article_id", "title", "chunk", "score")}
+        for c in items
+    ]
 
 
 def build_user_prompt(question: str, context: list[dict]) -> str:
@@ -109,9 +123,13 @@ def build_user_prompt(question: str, context: list[dict]) -> str:
         )
     blocks = []
     for i, c in enumerate(context, start=1):
+        authors = ", ".join(str(a) for a in c.get("_authors", [])) or "unknown"
         blocks.append(
             f"[{i}] article_id: {c['article_id']}\n"
             f"title: {c['title']}\n"
+            f"authors: {authors}\n"
+            f"url: {c.get('_url', '')}\n"
+            f"published: {c.get('_timestamp', '')}\n"
             f"passage: {c['chunk']}"
         )
     joined = "\n\n".join(blocks)
@@ -159,7 +177,7 @@ def prompt(req: PromptRequest):
     # Capital A in Augmented_prompt, and System/User, are what the spec asks for.
     return {
         "response": answer,
-        "context": context,
+        "context": public_context(context),
         "Augmented_prompt": {"System": SYSTEM_PROMPT, "User": user_prompt},
     }
 

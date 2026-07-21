@@ -3,6 +3,16 @@
 A Retrieval-Augmented Generation system over ~7,600 English Medium articles,
 deployed to Vercel with two public HTTP endpoints. University assignment.
 
+**Live URL:** https://individual-assignment-1-nirkap10s-projects.vercel.app
+
+```bash
+curl https://individual-assignment-1-nirkap10s-projects.vercel.app/api/stats
+
+curl -X POST https://individual-assignment-1-nirkap10s-projects.vercel.app/api/prompt \
+  -H "Content-Type: application/json" \
+  -d '{"question": "List exactly 3 articles about education. Return only the titles."}'
+```
+
 ## Chosen hyperparameters
 
 | parameter | value | can it change without re-embedding? |
