@@ -21,9 +21,9 @@ SUBSET_PATH = EVAL_DIR / "subset_ids.json"
 GOLD_PATH = EVAL_DIR / "gold.json"
 
 # --- models (course-provided OpenAI-compatible proxy) ---
-EMBED_MODEL = "ZYRANGG-text-embedding-3-small"
+EMBED_MODEL = "NBUECSE-text-embedding-3-small"
 EMBED_DIM = 1536
-CHAT_MODEL = "ZYRANGG-gpt-5-mini"
+CHAT_MODEL = "NBUECSE-gpt-5-mini"
 
 # --- embedding batching (assignment requires batching; never one-at-a-time) ---
 EMBED_BATCH = 128          # chunks per embedding API call (100-200 allowed)
@@ -34,6 +34,18 @@ EMBED_PRICE_PER_1M = 0.02  # USD per 1M tokens, text-embedding-3-small
 
 # --- Phase 2 sweep configs: (chunk_size_tokens, overlap_ratio) ---
 SWEEP_CONFIGS = [(256, 0.1), (512, 0.15), (1024, 0.2)]
+
+# --- Phase 3: winning config from eval/sweep_results.md ---
+# (256, 0.1) won on every metric: hit@3 0.90 and MRR 0.840 vs 0.80/0.757 (512)
+# and 0.80/0.750 (1024). Smaller chunks keep each vector topically tight.
+FINAL_CHUNK_SIZE = 256
+FINAL_OVERLAP = 0.1
+MAIN_NAMESPACE = "medium"
+
+# Fine-grained resume log for the full ingest: one line per completed batch.
+# Phase 2 could only resume a whole namespace, so a mid-run crash re-embedded
+# everything; this records progress per batch instead.
+INGEST_CHECKPOINT = EVAL_DIR / "full_ingest_checkpoint.json"
 
 # --- reproducible subset ---
 SUBSET_SIZE = 1000

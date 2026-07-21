@@ -9,6 +9,10 @@ __pycache__/
 # local scratch
 scratchpad/
 
+# ingest run artifacts — machine-local progress state, not results
+eval/full_ingest.log
+eval/full_ingest_checkpoint.json
+
 # large dataset — re-downloadable from the assignment link, kept out of the public repo
 medium-english-50mb.csv
 
