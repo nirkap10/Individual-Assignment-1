@@ -110,7 +110,10 @@ def build_user_prompt(question: str, context: list[dict]) -> str:
     )
 
 
+# Registered at both paths: depending on how Vercel mounts the function, the
+# app may receive "/api/prompt" or "/prompt".
 @app.post("/api/prompt")
+@app.post("/prompt")
 def prompt(req: PromptRequest):
     question = (req.question or "").strip()
     if not question:
@@ -152,6 +155,7 @@ def prompt(req: PromptRequest):
 
 
 @app.get("/api/stats")
+@app.get("/stats")
 def stats():
     return {
         "chunk_size": CHUNK_SIZE,
