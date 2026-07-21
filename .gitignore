@@ -16,6 +16,10 @@ eval/full_ingest_checkpoint.json
 # large dataset — re-downloadable from the assignment link, kept out of the public repo
 medium-english-50mb.csv
 
+# course material and local working notes — kept out of the public repo
+Individual Assignment-1.pdf
+CLAUDE(2).md
+
 # IDE / tooling
 .idea/
 .claude/
