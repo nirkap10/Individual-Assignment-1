@@ -81,12 +81,22 @@ def check_prompt(client, q: dict) -> list[str]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true", help="test every gold question")
+    ap.add_argument("--url", help="test a deployed URL over real HTTP instead of in-process")
     args = ap.parse_args()
 
-    from fastapi.testclient import TestClient
-    from api.index import app
+    if args.url:
+        import httpx
 
-    client = TestClient(app)
+        # Generous timeout: a cold serverless container has to boot, embed the
+        # question and call the chat model before it answers.
+        client = httpx.Client(base_url=args.url.rstrip("/"), timeout=120.0)
+        print(f"testing LIVE deployment: {args.url}")
+    else:
+        from fastapi.testclient import TestClient
+        from api.index import app
+
+        client = TestClient(app)
+        print("testing in-process (not the deployed app)")
     g = json.loads(config.GOLD_PATH.read_text(encoding="utf-8"))
     questions = g["questions"] if isinstance(g, dict) else g
     if not args.all:

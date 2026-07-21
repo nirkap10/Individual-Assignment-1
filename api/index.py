@@ -25,7 +25,7 @@ EMBED_MODEL = "NBUECSE-text-embedding-3-small"
 CHAT_MODEL = "NBUECSE-gpt-5-mini"
 
 # Required by the assignment, verbatim.
-SYSTEM_PROMPT = (
+REQUIRED_SYSTEM_PROMPT = (
     "You are a Medium-article assistant that answers questions strictly and "
     "only based on the Medium articles dataset context provided to you "
     "(metadata and article passages). You must not use any external knowledge, "
@@ -35,6 +35,19 @@ SYSTEM_PROMPT = (
     "data.\" Always explain your answer using the given context, quoting or "
     "paraphrasing the relevant article passage or metadata when helpful."
 )
+
+# The spec allows appending response-style clarifications as long as the
+# constraints above are kept. Without this the model sometimes emitted the
+# refusal sentence and then answered anyway, which reads as a wrong answer.
+STYLE_CLARIFICATION = (
+    " Response style: use the refusal sentence above only when the context "
+    "genuinely does not answer the question, and in that case say nothing "
+    "else. If the context does answer it, answer directly and do not include "
+    "the refusal sentence. When asked for a specific number of articles, "
+    "return exactly that many distinct titles."
+)
+
+SYSTEM_PROMPT = REQUIRED_SYSTEM_PROMPT + STYLE_CLARIFICATION
 
 app = FastAPI(title="Medium Article RAG Assistant")
 
@@ -110,10 +123,7 @@ def build_user_prompt(question: str, context: list[dict]) -> str:
     )
 
 
-# Registered at both paths: depending on how Vercel mounts the function, the
-# app may receive "/api/prompt" or "/prompt".
 @app.post("/api/prompt")
-@app.post("/prompt")
 def prompt(req: PromptRequest):
     question = (req.question or "").strip()
     if not question:
@@ -155,7 +165,6 @@ def prompt(req: PromptRequest):
 
 
 @app.get("/api/stats")
-@app.get("/stats")
 def stats():
     return {
         "chunk_size": CHUNK_SIZE,
