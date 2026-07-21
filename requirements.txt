@@ -1,6 +1,10 @@
 # Deployed Vercel function ONLY. It embeds one question and queries Pinecone.
 # Do NOT add pandas or tiktoken here -- those belong to the local ingestion
 # scripts (see requirements-dev.txt).
-fastapi==0.115.6
-openai==1.59.6
-pinecone==5.4.2
+#
+# Pinned to the exact versions eval/check_api.py was verified against. openai
+# and pinecone have both had breaking major releases, so these are pins, not
+# floors -- do not relax them without re-running the contract check.
+fastapi==0.139.2
+openai==2.45.0
+pinecone==9.1.0

@@ -5,3 +5,6 @@ openai
 pinecone
 python-dotenv
 numpy
+# needed by eval/check_api.py, which exercises the API app in-process
+fastapi
+httpx
