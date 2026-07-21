@@ -11,8 +11,6 @@ Costs one embedding + one chat call per question asked (default 2).
 Run: python -m eval.check_api            # 2 questions
      python -m eval.check_api --all      # every gold question
 """
-from __future__ import annotations
-
 import argparse
 import json
 import sys

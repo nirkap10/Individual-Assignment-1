@@ -3,8 +3,6 @@
 article_id == 0-based row index in the CSV. All 7,682 rows are kept
 (no deduplication); duplicate content is handled at retrieval time instead.
 """
-from __future__ import annotations
-
 import ast
 
 import pandas as pd

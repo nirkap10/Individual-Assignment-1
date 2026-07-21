@@ -1,43 +1,30 @@
-"""FastAPI app deployed as a Vercel Python serverless function.
+"""FastAPI app for Vercel. Exposes POST /api/prompt and GET /api/stats.
 
-Exposes POST /api/prompt and GET /api/stats.
-
-This module is intentionally self-contained: it must not import from ingest/,
-because those modules pull in pandas and tiktoken, which would bloat the
-deployed function. It only needs to embed one question and query Pinecone.
+Does not import from ingest/ -- those modules need pandas and tiktoken, which
+don't belong in the deployed function.
 """
-from __future__ import annotations
-
 import os
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-# --- deployed hyperparameters -------------------------------------------------
-# These MUST mirror what was actually ingested (see ingest/config.py:
-# FINAL_CHUNK_SIZE / FINAL_OVERLAP / MAIN_NAMESPACE). CHUNK_SIZE and
-# OVERLAP_RATIO are descriptive here -- they are baked into the vectors and
-# cannot be changed without re-embedding. TOP_K is free to tune at any time.
+# Must match what was ingested (ingest/config.py). Changing chunk size or
+# overlap here would be a lie -- they're baked into the vectors.
 CHUNK_SIZE = 256
 OVERLAP_RATIO = 0.1
-# 15, not 8: the sweep put g02's third distinct article around rank 14, and at
-# top_k=8 the model correctly refused ("I don't know") because it could only
-# see one education article. 15 satisfies the "list exactly 3 distinct
-# articles" requirement. Still within the assignment cap of top_k <= 30.
+# 8 was too low: the "list 3 articles about education" question only found one
+# of them, so the model refused. Its third article sits at rank 15.
 TOP_K = 15
 
-# Over-fetch raw chunks, then collapse to distinct articles. Without this,
-# "list 3 articles about education" can return 3 chunks of the SAME article.
-# 30 chunks yields ~22 distinct articles on the full corpus, comfortably more
-# than TOP_K, so nothing is starved.
+# Fetch extra chunks so that collapsing them to distinct articles still leaves
+# at least TOP_K. 30 chunks gives ~22 articles on the full corpus.
 OVERFETCH = 30
 
 NAMESPACE = "medium"
 EMBED_MODEL = "NBUECSE-text-embedding-3-small"
 CHAT_MODEL = "NBUECSE-gpt-5-mini"
 
-# Verbatim from the assignment spec. Do not reword -- the constraints in this
-# text are graded. Style clarifications may be appended, not substituted.
+# Required by the assignment, verbatim.
 SYSTEM_PROMPT = (
     "You are a Medium-article assistant that answers questions strictly and "
     "only based on the Medium articles dataset context provided to you "
@@ -82,10 +69,10 @@ class PromptRequest(BaseModel):
 
 
 def dedup_to_articles(matches) -> list[dict]:
-    """Collapse chunk hits to distinct articles, keeping the best chunk each.
+    """Collapse chunks to distinct articles, keeping the best chunk of each.
 
-    Pinecone returns matches in descending score order, so the first chunk seen
-    for an article_id is that article's highest-scoring chunk.
+    Matches come back sorted by score, so the first chunk seen for an
+    article_id is its highest-scoring one.
     """
     best: dict[str, dict] = {}
     for m in matches:
@@ -156,8 +143,7 @@ def prompt(req: PromptRequest):
     )
     answer = completion.choices[0].message.content or ""
 
-    # Key casing here is fixed by the spec (capital A, System, User) and a
-    # grading script may check it literally.
+    # Capital A in Augmented_prompt, and System/User, are what the spec asks for.
     return {
         "response": answer,
         "context": context,

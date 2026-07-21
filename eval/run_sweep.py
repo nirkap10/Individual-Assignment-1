@@ -11,8 +11,6 @@ Writes eval/sweep_results.md. You choose the winning config from the table.
 
 Run:  python -m eval.run_sweep
 """
-from __future__ import annotations
-
 import json
 from pathlib import Path
 

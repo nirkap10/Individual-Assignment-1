@@ -12,8 +12,6 @@ Safety:
 Run (dry run) : python -m ingest.sweep_ingest
 Run (spend)   : python -m ingest.sweep_ingest --yes
 """
-from __future__ import annotations
-
 import argparse
 import json
 import sys

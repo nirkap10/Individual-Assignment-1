@@ -3,8 +3,6 @@
 Never embeds one chunk at a time. Callers pass a list of texts; this splits
 into batches of config.EMBED_BATCH and returns vectors in input order.
 """
-from __future__ import annotations
-
 from openai import OpenAI
 
 from ingest import config

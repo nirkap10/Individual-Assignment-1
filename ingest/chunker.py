@@ -7,8 +7,6 @@ algorithm without re-running the sweep.
 chunk_size is measured in tokens (tiktoken cl100k_base, a good proxy for
 text-embedding-3-small). Stride = chunk_size * (1 - overlap_ratio).
 """
-from __future__ import annotations
-
 from dataclasses import dataclass
 
 import tiktoken

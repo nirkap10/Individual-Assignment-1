@@ -4,13 +4,13 @@ The subset ALWAYS contains every gold-set target id, plus a fixed random
 sample of distractors (seed config.SUBSET_SEED). Writes eval/subset_ids.json.
 Local only; no API calls, no cost.
 
+The committed eval/subset_ids.json is the record of the subset that was
+actually embedded into the Phase 2 sweep namespaces.
+
 Run:  python -m ingest.build_subset
 """
-from __future__ import annotations
-
 import json
-
-import numpy as np
+import random
 
 from ingest import config
 from ingest import data
@@ -27,10 +27,10 @@ def build() -> dict:
     all_ids = df["article_id"].tolist()
     g = gold_ids()
 
-    rng = np.random.default_rng(config.SUBSET_SEED)
+    rng = random.Random(config.SUBSET_SEED)
     pool = [i for i in all_ids if i not in set(g)]
     n_fill = config.SUBSET_SIZE - len(g)
-    fill = rng.choice(pool, size=n_fill, replace=False).tolist()
+    fill = rng.sample(pool, n_fill)
     subset = sorted(set(g) | set(int(x) for x in fill))
 
     assert set(g).issubset(subset), "subset must contain all gold ids"

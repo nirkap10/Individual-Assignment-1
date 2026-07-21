@@ -18,8 +18,6 @@ Run (dry run) : python -m ingest.full_ingest
 Run (spend)   : python -m ingest.full_ingest --yes
 Reset resume  : python -m ingest.full_ingest --reset
 """
-from __future__ import annotations
-
 import argparse
 import json
 import sys

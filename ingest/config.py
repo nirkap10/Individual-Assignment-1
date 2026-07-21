@@ -3,8 +3,6 @@
 These scripts run locally only and are NEVER deployed to Vercel.
 Loads secrets from a gitignored .env at the repo root.
 """
-from __future__ import annotations
-
 import os
 from pathlib import Path
 
@@ -35,16 +33,12 @@ EMBED_PRICE_PER_1M = 0.02  # USD per 1M tokens, text-embedding-3-small
 # --- Phase 2 sweep configs: (chunk_size_tokens, overlap_ratio) ---
 SWEEP_CONFIGS = [(256, 0.1), (512, 0.15), (1024, 0.2)]
 
-# --- Phase 3: winning config from eval/sweep_results.md ---
-# (256, 0.1) won on every metric: hit@3 0.90 and MRR 0.840 vs 0.80/0.757 (512)
-# and 0.80/0.750 (1024). Smaller chunks keep each vector topically tight.
+# --- Phase 3: config chosen from eval/sweep_results.md ---
 FINAL_CHUNK_SIZE = 256
 FINAL_OVERLAP = 0.1
 MAIN_NAMESPACE = "medium"
 
-# Fine-grained resume log for the full ingest: one line per completed batch.
-# Phase 2 could only resume a whole namespace, so a mid-run crash re-embedded
-# everything; this records progress per batch instead.
+# Resume position for the full ingest, updated after every batch.
 INGEST_CHECKPOINT = EVAL_DIR / "full_ingest_checkpoint.json"
 
 # --- reproducible subset ---
